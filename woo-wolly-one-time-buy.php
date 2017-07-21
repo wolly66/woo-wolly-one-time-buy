@@ -6,7 +6,7 @@
  */
 /*
 Plugin Name: Woo Wolly One Time Buy
-Plugin URI: https://paolovalenti.info
+Plugin URI: https://paolovalenti.org/my-plugins/woo-wolly-one-time-buy/
 Description: This plugin has all the utility for insight room
 Author: Paolo Valenti aka Wolly for WordPress Italy
 Version: 1.0
