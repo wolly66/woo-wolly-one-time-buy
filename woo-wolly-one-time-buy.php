@@ -59,6 +59,10 @@ class Woo_Wolly_One_Time_Buy {
 			
 		//check if product is a one time buy and if it's already purchased	
 		add_filter('woocommerce_add_to_cart_validation', array( $this, 'add_to_cart_validation' ),20, 2);
+		
+		
+		//remove from cart
+		add_action( 'template_redirect',  array( $this, 'remove_from_cart' ) );
 			
 			
 					
@@ -167,6 +171,47 @@ class Woo_Wolly_One_Time_Buy {
 	}
 
 	
+	/**
+	 * remove_from_cart function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function remove_from_cart(){
+		
+		// Run only in the Cart or Checkout Page
+		if( is_cart() || is_checkout() ) {
+        
+        $current_user = wp_get_current_user();
+
+        // Cycle through each product in the cart
+        foreach( WC()->cart->cart_contents as $prod_in_cart ) {
+	        
+	    	$prod_id = ( isset( $prod_in_cart['variation_id'] ) && $prod_in_cart['variation_id'] != 0 ) ? $prod_in_cart['variation_id'] : $prod_in_cart['product_id'];
+	        
+			$is_one_time_buy = get_post_meta( $prod_id, '_one_time_buy_checkbox', true );
+	        
+			if ( ! empty( $is_one_time_buy ) ){
+		        
+				if ( wc_customer_bought_product( $current_user->user_email, $current_user->ID, $prod_id ) ) {
+	    	
+					wc_add_notice( __( 'You\'ve already purchased this product! It can only be purchased once.', 'woo-wolly-one-time-buy' ), 'error' );
+
+					// Get it's unique ID within the Cart
+					$prod_unique_id = WC()->cart->generate_cart_id( $prod_id );
+					// Remove it from the cart by un-setting it
+					unset( WC()->cart->cart_contents[$prod_unique_id] );
+                
+                }
+		        
+		    }
+            
+        }
+
+    	}
+		
+		
+	}
 
 	
 }
